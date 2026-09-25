@@ -26,3 +26,5 @@ npm test && npm run typecheck                 # mock-server tests, no API key ne
 | `presets/` | generic examples only |
 
 Config: `~/.config/jev-kit/config.json` — `{ "budget": { "tokensPerDay": 500000 }, "consumers": { "isa": { "requestsPerHour": 600 } }, "breaker": { "failures": 5, "cooldownMs": 60000 } }`.
+
+MIT — see [LICENSE](LICENSE). Not affiliated with TypeSafe; "Jev" and "System One" belong to their owners.
