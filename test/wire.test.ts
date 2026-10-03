@@ -92,4 +92,12 @@ describe("classifyError", () => {
     assert.equal(classifyError(new sdk.APIConnectionError("down"))?.kind, "error");
     assert.equal(classifyError(new sdk.APIUserAbortError()), null);
   });
+
+  it("credit classification: 402, or a credit-worded error whatever its status → credit", async () => {
+    const sdk = await import("@typesafe-ai/sdk");
+    const h = new Headers();
+    assert.equal(classifyError(sdk.APIError.fromResponse(402, {}, h))?.kind, "credit");
+    assert.equal(classifyError(sdk.APIError.fromResponse(403, { error: "Insufficient credit balance" }, h))?.kind, "credit");
+    assert.equal(classifyError(sdk.APIError.fromResponse(429, { error: "credit exhausted" }, h))?.kind, "credit");
+  });
 });

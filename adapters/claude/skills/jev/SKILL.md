@@ -36,7 +36,7 @@ Not served (non-zero exit, same JSON shape on **stdout**):
 ```
 
 - **`ok:false` is not an error and jev never guesses for you.** Do the task without Jev (your own logic, or ask the user). Do not invent the answers, and do not re-enable Jev to get around it.
-- Reasons: `disabled` · `tripped` (breaker) · `budget` · `error` · `auth` · `no_key`. Exit: `0` served · `2` invalid input (stderr) · `3` auth/no key · `4` unavailable · `5` budget.
+- Reasons: `disabled` · `tripped` (breaker) · `budget` · `error` · `auth` · `credit` (out of TypeSafe credit: top up, then `jev reset`) · `no_key`. Exit: `0` served · `2` invalid input (stderr) · `3` auth/no key · `4` unavailable · `5` budget.
 - `jev check [--consumer x]` is a free local preflight (no network): use it before expensive prep work. It is not a guarantee — still handle `ok:false` on the call.
 - Answers are Jev's official ones, with the value field (`noul`/`choice`/`score`) renamed `answer`. noul: P(yes) in [0,1], no `confidence` field. choice/score: `probabilities` and `confidence` (score also `legend`). Gate actions on confidence, not just the answer.
 

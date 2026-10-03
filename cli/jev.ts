@@ -37,7 +37,7 @@ jev never answers in Jev's place. When Jev can't serve a call, stdout is
   {"ok":false,"consumer":…,"unavailable":{"reason":…,"detail":…}}
 and the exit code is non-zero, so the caller can run its own logic:  jev run x < in.json || my-heuristic
 
-Exit codes: 0 served · 2 invalid input · 3 auth / no key · 4 unavailable (disabled, tripped, error) · 5 budget
+Exit codes: 0 served · 2 invalid input · 3 auth / no key · 4 unavailable (disabled, tripped, credit, error) · 5 budget
 Invalid input is JSON on stderr; "unavailable" is JSON on stdout.
 Presets: $JEV_KIT_PRESETS, ~/.config/jev-kit/presets, ./presets.`;
 

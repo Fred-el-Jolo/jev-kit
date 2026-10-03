@@ -13,6 +13,7 @@ export type UnavailableReason =
   | "budget" // token or request cap reached
   | "error" // the call failed (5xx, timeout, connection, sustained 429)
   | "auth" // key rejected (401/403)
+  | "credit" // TypeSafe account out of credit (402 or credit-worded error)
   | "no_key"; // no API key resolved for this consumer
 
 export interface Unavailable {

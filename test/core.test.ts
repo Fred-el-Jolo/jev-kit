@@ -244,6 +244,15 @@ describe("breaker", () => {
     assert.ok((await ask(req({ consumer: "photos" }), env)).ok);
   });
 
+  it("402 → credit, trips at once, check says to top up", async () => {
+    const env = setup({ breaker: { failures: 5 } });
+    mock.queue.push([402, { error: "payment required" }]);
+    assert.equal(reasonOf(await ask(req({ consumer: "isa" }), env)), "credit");
+    const c = check("isa", env);
+    assert.ok(!c.ok && c.unavailable.reason === "tripped" && /top up TypeSafe credits/.test(c.unavailable.detail));
+    assert.equal(mock.requests.length, 1);
+  });
+
   it("missing key → no_key, no request, state untouched", async () => {
     const env = setup();
     delete env.TYPESAFE_API_KEY;

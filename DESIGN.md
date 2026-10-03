@@ -133,7 +133,7 @@ itself must still be handled when it is not served. `check` never consumes the h
 
 // Jev did not serve it — not an error; the caller does its own thing
 { "ok": false, "consumer": "isa",
-  "unavailable": { "reason": "disabled" | "tripped" | "budget" | "error" | "auth" | "no_key", "detail": "…" } }
+  "unavailable": { "reason": "disabled" | "tripped" | "budget" | "error" | "auth" | "credit" | "no_key", "detail": "…" } }
 ```
 
 Only caller bugs are **thrown** (`JevKitError` `invalid_input`: bad questions, non-text state, a
@@ -155,7 +155,7 @@ exit, so shell callers can `jev run x < in.json || my-heuristic`:
 | `0` | served |
 | `2` | invalid input (JSON on stderr) |
 | `3` | auth: key rejected, or none configured |
-| `4` | unavailable: disabled, tripped, or the call failed |
+| `4` | unavailable: disabled, tripped, out of credit (`credit`), or the call failed |
 | `5` | budget reached |
 
 ## Decisions
@@ -181,7 +181,9 @@ Open points, settled at implementation (all reversible):
 
 - Breaker is **per consumer only**. The global scope has the manual switch and global budget caps.
 - Auth failure (401/403) trips that consumer immediately (`auth`); a *missing* key is `no_key`
-  and does not touch state. A 400/422 is a caller bug: `invalid_input`, thrown, no trip.
+  and does not touch state. Out of credit (402, or an error whose text mentions credit/balance/
+  billing/payment) is `credit`: it trips that consumer at once, the detail says "top up TypeSafe
+  credits, then `jev reset`", and the usual cooldown probe still runs. A 400/422 is a caller bug: `invalid_input`, thrown, no trip.
 - Env `JEV_KIT=on` overrides a manual `off`, **not** an open breaker. `jev enable` clears manual
   off and the breaker; `jev reset` clears only the breaker.
 - Budgets are checked before the call from the ledger, so a call can overshoot the cap by one request.

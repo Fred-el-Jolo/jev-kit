@@ -70,12 +70,14 @@ substitute answers. Reasons and how they arise:
 | `no_key` | no API key resolved for the consumer | no |
 | `error` | 429 (after SDK retries), 5xx / 529, timeout, connection error | yes |
 | `auth` | 401 / 403 | yes |
+| `credit` | 402, or any error whose text matches `credit\|balance\|insufficient\|payment\|billing` | yes |
 
 ## 4. Errors and limits
 
 | Jev / SDK | jev-kit | Breaker |
 |---|---|---|
 | `422 Unprocessable Entity`, `400` (`UnprocessableEntityError`, `BadRequestError`) | **thrown** `JevKitError` `invalid_input` (CLI exit 2) | not counted |
+| `402`, or any status with credit wording (the docs don't specify the out-of-credit response) | returned, `reason: "credit"` (exit 4), detail ends with a top-up hint | trips that consumer at once |
 | `401` / `403` (`AuthenticationError`, `PermissionDeniedError`) | returned, `reason: "auth"` (exit 3) | trips that consumer at once |
 | `429`, `5xx`, `529`, timeout, connection (`RateLimitError`, `InternalServerError`, `APIConnectionError`, …) | returned, `reason: "error"` (exit 4) | counts toward N failures |
 | user abort (`APIUserAbortError`) | rethrown as is | not counted |

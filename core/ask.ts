@@ -101,7 +101,9 @@ async function execute(req: AskRequest, consumer: string, cfg: Config, env: Node
     }
     log(false);
     const auth = c.kind === "auth";
-    recordFailure(consumer, { threshold: cfg.breaker.failures, reason: c.detail, immediate: auth, auth }, Date.now(), env);
+    const credit = c.kind === "credit";
+    const reason = credit ? `credit: ${c.detail} — top up TypeSafe credits, then \`jev reset\`` : c.detail;
+    recordFailure(consumer, { threshold: cfg.breaker.failures, reason, immediate: auth || credit, auth }, Date.now(), env);
     return { ok: false, consumer, unavailable: { reason: c.kind, detail: c.detail } };
   }
 }

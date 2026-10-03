@@ -4,6 +4,7 @@
  * every difference and what to change when the API evolves.
  */
 import {
+  APIError,
   APIUserAbortError,
   AuthenticationError,
   BadRequestError,
@@ -100,13 +101,18 @@ export function fromJevResponse(res: SystemOneResult<any>): { model: string; ans
 export type Classified =
   | { kind: "invalid_input"; detail: string } // 400 / 422: the request is wrong; thrown, no breaker
   | { kind: "auth"; detail: string } //          401 / 403: trips the consumer's breaker at once
+  | { kind: "credit"; detail: string } //        402, or a credit-worded error: trips at once
   | { kind: "error"; detail: string }; //        429 (after SDK retries), 5xx/529, timeout, connection
+
+/** Out-of-credit wording. The docs don't specify the response, so match the status and the text. */
+const CREDIT = /credit|balance|insufficient|payment|billing/i;
 
 /** Returns null for a user abort, which the caller must rethrow. */
 export function classifyError(e: unknown): Classified | null {
   if (e instanceof APIUserAbortError) return null;
   const detail = (e as Error).message;
   if (e instanceof UnprocessableEntityError || e instanceof BadRequestError) return { kind: "invalid_input", detail };
+  if (e instanceof APIError && (e.status === 402 || CREDIT.test(detail))) return { kind: "credit", detail };
   if (e instanceof AuthenticationError || e instanceof PermissionDeniedError) return { kind: "auth", detail };
   return { kind: "error", detail };
 }
