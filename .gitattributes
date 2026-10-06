@@ -1,2 +1,0 @@
-.isa/**/*.md filter=isa
-.isa/**/evidence.jsonl merge=union
