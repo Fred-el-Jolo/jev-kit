@@ -28,7 +28,7 @@ adapters/pi/     pi extension: generic tools + events -> core (in-process)
 adapters/claude/ generic SKILL.md + hook helper -> cli
 ```
 
-Stack: TypeScript on Node 24 (type stripping, no build step), pinned by `mise.toml`.
+Stack: TypeScript on Node 26 (type stripping, no build step), pinned by `mise.toml`.
 Only runtime dep: `@typesafe-ai/sdk`. Anything use-case specific (`sharp`, `exifr`, markdown
 parsing…) belongs to the consumer module, which depends on `core`.
 
